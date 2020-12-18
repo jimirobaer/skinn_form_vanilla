@@ -14,15 +14,15 @@ var Site = {
             Forms.forEach(function (form) {
 
                 Site.form_reset_inputs(form);
+                Site.form_validate_input(form);
                 Site.form_handle_input(form);
-                Site.form_track_progress(form);
 
                 if (Buttons.length > 0) {
 
                     Buttons.forEach(function (button) {
                         button.addEventListener('click', event => {
+                            Site.form_validate_input(form, event);
                             Site.form_handle_input(form, event);
-                            Site.form_track_progress(form, event);
                         });
                     });
 
@@ -91,7 +91,7 @@ var Site = {
 
     },
 
-    form_handle_input: (form, event) => {
+    form_validate_input: (form, event) => {
 
         const Questions = Site.form_collect_questions(form);
 
@@ -102,63 +102,65 @@ var Site = {
 
     },
 
-    form_track_progress: (form, event) => {
+    form_handle_input: (form, event) => {
+
+        console.log(event);
 
         const Questions = Site.form_collect_questions(form);
         const totalAmountOfQuestions = Questions.length - 1;
 
-        let currentStoredQuestion = localStorage.getItem('currentQuestion');
+        // Write currentQuestion
+        let currentQuestionValue = parseInt(localStorage.getItem('currentQuestion'));
+        let currentQuestion = Questions[currentQuestionValue];
 
-        // Reset active state
+        let currentQuestionStored = localStorage.getItem('currentQuestion');
+
+        // Reset states
         if (!event) {
-            if (!currentStoredQuestion) {
+
+            reset_buttons();
+
+            if (!currentQuestionStored) {
+                // Executes on fresh reload
                 localStorage.setItem('currentQuestion', 0);
                 set_active_class(0);
             } else {
-                set_active_class(currentStoredQuestion);
+                // Executes when next question loads
+                set_active_class(currentQuestionStored);
+                Site.form_handle_key_press(currentQuestion, form);
+                // Set focus
+                currentQuestion.querySelectorAll('input, textarea')[0].focus();
             }
+
         } else {
 
-            // Write currentQuestion
-            let currentQuestionValue = parseInt(localStorage.getItem('currentQuestion'));
-            let currentQuestion = Questions[currentQuestionValue];
-
+            reset_buttons();
+            
+            /* Form Controls based on Event Input
+             */
             switch (event.target.dataset.action) {
                 case 'next':
-
-                    if (Site.form_test_inputs(currentQuestion) == 'valid') {
-
-                        console.log(currentQuestionValue);
-
-                        if (currentQuestionValue < totalAmountOfQuestions) {
-                            currentQuestion.classList.remove('is-active');
-                            localStorage.setItem('currentQuestion', parseInt(currentQuestionValue) + 1);
-                            Site.form_track_progress(form);
-                        }
-
-                        // Hide when last question shows
-                        if (currentQuestionValue == totalAmountOfQuestions - 1) {
-                            event.target.style.display = "none";
-                        }
-
-                    } else {
-                        alert('Invalid input, please check');
-                    }
-
+                    next_question(event);
                     break;
                 case 'prev':
-
-                    if (currentQuestionValue > 0) {
-                        localStorage.setItem('currentQuestion', parseInt(currentQuestionValue) - 1);
-                        Site.form_track_progress(form);
-                    }
-
+                    prev_question(event);
                     break;
                 case 'submit':
-                    console.log(event);
+                    submit_form(event);
                     break;
                 default:
                     break;
+            }
+
+            /* Form Controls based on Keydown Event Input
+             */
+            if (event.keyCode) {
+                
+                if (event.keyCode == 13) {
+                    next_question();
+                    return true;
+                }
+
             }
 
         }
@@ -166,6 +168,94 @@ var Site = {
         function set_active_class(index) {
             Questions[index].classList.add('is-active');
         }
+
+        function next_question() {
+
+            if (Site.form_test_inputs(currentQuestion) == 'valid') {
+
+                if (currentQuestionValue < totalAmountOfQuestions) {
+                    currentQuestion.classList.remove('is-active');
+                    localStorage.setItem('currentQuestion', parseInt(currentQuestionValue) + 1);
+                    Site.form_handle_input(form);
+                }
+
+            } else {
+                alert('Invalid input, please check');
+            }
+
+        }
+
+        function prev_question() {
+            if (currentQuestionValue > 0) {
+                currentQuestion.classList.remove('is-active');
+                localStorage.setItem('currentQuestion', parseInt(currentQuestionValue) - 1);
+                Site.form_handle_input(form);
+            }
+        }
+
+        function submit_form(event) {
+            event.preventDefault();
+        }
+
+        function reset_buttons() {
+
+            let btnNext = document.querySelector('[data-action=next]');
+            let btnPrev = document.querySelector('[data-action=prev]');
+            let btnSubmit = document.querySelector('[data-action=submit]');
+
+            if (currentQuestionValue > 0) {
+                btnPrev.style.display = 'inline';
+            } else {
+                btnPrev.style.display = 'none';
+            }
+
+            if (currentQuestionValue == totalAmountOfQuestions) {
+                btnSubmit.style.display = 'inline';
+                btnNext.style.display = 'none';
+            } else {
+                btnSubmit.style.display = 'none';
+                btnNext.style.display = 'inline';
+            }
+
+        }
+
+    },
+
+    form_handle_key_press: (question, form) => {
+
+        const Inputs = Site.form_collect_inputs(question);
+        form.addEventListener('keydown', read_keys);
+
+        function read_keys(event) {
+
+            if (event.isComposing || event.keyCode === 229) {
+                return;
+            }
+
+            Inputs.forEach(input => {
+
+                if (input.dataset.key) {
+                    let inputKeys = input.dataset.key.split(',');
+                    let keyCode = event.keyCode.toString();
+
+                    if (inputKeys.includes(keyCode)) {
+
+                        if (Site.form_handle_input(form, event) == true) {
+                            this.removeEventListener('keydown', read_keys);
+                        }
+
+                    };
+
+                } else {
+                    return false;
+                }
+
+            });
+
+        }
+
+        // Get keys
+
 
     },
 
