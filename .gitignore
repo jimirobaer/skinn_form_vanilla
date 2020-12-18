@@ -1,0 +1,53 @@
+# System files
+# ---------------
+
+*~
+*.diff
+*.css.map
+*.esproj
+*.err
+*.log
+*.orig
+*.rej
+*.sass-cache
+*.sublime-project
+*.sublime-workspace
+*.swo
+*.swp
+*.vi
+
+._*
+.buildpath
+.cache
+.com.apple*
+.CVS
+.dropbox
+.DS_Store
+.hg
+.idea
+.project
+.settings
+.svn
+.tmp
+.tmproj
+.tm_properties
+
+intermediate
+publish
+Thumbs.db
+Icon
+
+# Development-related files
+# ---------------
+
+node_modules
+npm-debug.log
+.cache
+
+# Lock files
+# ---------------
+.lock
+
+# Dist folder (remote build)
+# ---------------
+dist/*
