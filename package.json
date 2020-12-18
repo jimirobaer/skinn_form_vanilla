@@ -10,6 +10,10 @@
   "author": "Jimi Robaer",
   "license": "ISC",
   "devDependencies": {
-    "parcel-bundler": "^1.12.4"
+    "parcel-bundler": "^1.12.4",
+    "sass": "^1.30.0"
+  },
+  "dependencies": {
+    "sanitize.css": "^12.0.1"
   }
 }

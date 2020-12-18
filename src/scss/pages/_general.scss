@@ -1,0 +1,22 @@
+/*
+ *  Pages: General
+ *  ---
+ */
+
+/* Brand */
+
+:root {
+    --color-dark: #3d3d3e;
+}
+
+html,
+body {
+    font-family: sans-serif;
+    font-size: 14px;
+    margin: 0;
+    color: var(--color-dark);
+}
+
+* {
+    box-sizing: border-box;
+}
