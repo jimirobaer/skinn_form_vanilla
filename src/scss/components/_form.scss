@@ -1,0 +1,45 @@
+.form__wrapper {
+    position: relative;
+    height: 100vh;
+}
+ 
+.form__question {
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+
+    opacity: 0;
+    pointer-events: none;
+    
+    position: absolute;
+
+    // States
+    &.is-active {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    &.is-invalid {
+        background-color: rgba(red, 0.5);
+    }
+
+}
+
+.form__controls {
+
+    position: absolute;
+    padding: 4rem;
+    display: flex;
+    bottom: 0;
+
+    flex-direction: row;
+
+    align-items: center;
+    justify-content: space-around;
+
+    width: 100%;
+
+}

@@ -12,59 +12,75 @@
 
 <body>
 
-    <main class="form__wrapper" data-form="1">
+    <main class="js-form" data-form="1">
 
-        <div class="form__question" data-question="1">
+        <form class="form__wrapper" action="" id="form-1">
 
-            <div class="form__group">
-                <label for="question-1">What's your name?</label>
-                <input type="text" name="form-1-question-1" id="question-1">
-            </div>
+            <div class="form__question" data-question="1" data-required="true">
 
-        </div>
-
-        <div class="form__question" data-question="2">
-
-            <div class="form__group">
-                <p>How do you like this form so far?</p>
-
-                <div class="input__group">
-                    <input type="radio" id="1" name="form-1-question-2" value="1">
-                    <label for="1">It's okay</label>
-                </div>
-
-                <div class="input__group">
-                    <input type="radio" id="2" name="form-1-question-2" value="2">
-                    <label for="2">Pretty good</label>
-                </div>
-
-                <div class="input__group">
-                    <input type="radio" id="3" name="form-1-question-2" value="3">
-                    <label for="3">Stunning</label>
-                </div>
-
-                <div class="input__group">
-                    <input type="radio" id="4" name="form-1-question-2" value="4">
-                    <label for="4">Give the creator a job</label>
+                <div class="form__group">
+                    <label for="question-1">What's your name?</label>
+                    <input type="text" name="form-1-question-1" id="question-1" data-question="1" required>
                 </div>
 
             </div>
 
-        </div>
+            <div class="form__question" data-question="2" data-required="true">
 
-        <div class="form__question" data-question="3">
+                <div class="form__group">
+                    <p>How do you like this form so far?</p>
 
-            <div class="form__group">
-                <label for="question-3">Something to add?</label>
-                <textarea name="form-1-question-3" id="question-3" cols="30" rows="10"></textarea>
+                    <div class="input__group">
+                        <input type="radio" id="1" name="form-1-question-2" value="1" data-question="2" required>
+                        <label for="1">It's okay</label>
+                    </div>
+
+                    <div class="input__group">
+                        <input type="radio" id="2" name="form-1-question-2" data-question="2" value="2">
+                        <label for="2">Pretty good</label>
+                    </div>
+
+                    <div class="input__group">
+                        <input type="radio" id="3" name="form-1-question-2" data-question="2" value="3">
+                        <label for="3">Stunning</label>
+                    </div>
+
+                    <div class="input__group">
+                        <input type="radio" id="4" name="form-1-question-2" data-question="2" value="4">
+                        <label for="4">Give the creator a job</label>
+                    </div>
+
+                </div>
+
             </div>
 
-        </div>
+            <div class="form__question" data-question="3" data-required="true">
+
+                <div class="form__group">
+                    <label for="question-3">Something to add?</label>
+                    <textarea name="form-1-question-3" id="question-3" cols="30" rows="10" data-question="3"
+                        required></textarea>
+                </div>
+
+            </div>
+
+        </form>
 
     </main>
 
     <div class="form__controls">
-        <button type="submit" data-submit="1">Next</button>
+
+        <div class="form__progress">
+            <label for="form">Form progress</label>
+            <progress id="form" value="0" max="3"> 0 </progress>
+        </div>
+
+        <div class="form__buttons">
+            <button data-form-button data-action="prev" data-form="form-1">Prev</button>
+            <button data-form-button data-action="next" data-form="form-1">Next</button>
+            <button type="submit" data-form-button data-action="submit" form="form-1" data-form="form-1">Submit</button>
+        </div>
+
     </div>
 
     <script src="/src/js/app.js"></script>
