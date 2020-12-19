@@ -1,74 +1,74 @@
 var Site = {
 
     init: () => {
-        Site.init_form();
+        Form.init();
     },
 
-    init_form: () => {
+}
 
-        const Forms = document.querySelectorAll('.js-form form');
-        const Buttons = document.querySelectorAll('[data-form-button]');
+var Form = (function () {
+
+    var public = {};
+
+    const Forms = document.querySelectorAll('.js-form form');
+    const Buttons = document.querySelectorAll('[data-form-button]');
+    const FormElements = ['input', 'textarea', 'select'];
+
+    // Methods
+    public.init = function () {
 
         if (Forms.length > 0) {
-
             Forms.forEach(function (form) {
-
-                Site.form_reset_inputs(form);
-                Site.form_validate_input(form);
-                Site.form_handle_input(form);
+                form_reset_inputs(form);
+                form_validate_input(form);
+                form_handle_input(form);
 
                 if (Buttons.length > 0) {
-
                     Buttons.forEach(function (button) {
                         button.addEventListener('click', event => {
-                            Site.form_validate_input(form, event);
-                            Site.form_handle_input(form, event);
+                            form_validate_input(form, event);
+                            form_handle_input(form, event);
                         });
                     });
-
                 }
 
             });
 
         }
 
-    },
+    };
 
-    form_reset_inputs: (form) => {
-        form.reset();
-        localStorage.setItem('currentQuestion', 0);
-    },
+    // Private
 
-    form_collect_questions: (form) => {
+    let form_collect_questions = (form) => {
 
         const Questions = form.querySelectorAll('.form__question');
-        let formQuestions = [];
+        let formQuestionsArray = [];
 
         Questions.forEach(question => {
-            formQuestions.push(question);
+            formQuestionsArray.push(question);
         });
 
-        return formQuestions;
+        return formQuestionsArray;
 
-    },
+    }
 
-    form_collect_inputs: (form) => {
+    let form_collect_inputs = (form) => {
 
-        const formElements = 'input, textarea, select';
-        let formInputs = [];
+        let formInputsArray = [];
 
-        form.querySelectorAll(formElements).forEach(input => {
-            formInputs.push(input);
+        form.querySelectorAll(FormElements).forEach(input => {
+            formInputsArray.push(input);
         });
 
-        return formInputs;
+        return formInputsArray;
 
-    },
+    }
 
-    form_test_inputs: (question) => {
+    let form_test_inputs = (question) => {
 
-        const Inputs = Site.form_collect_inputs(question);
-        let state = null;
+        const Inputs = form_collect_inputs(question);
+        let inputState = null;
 
         Inputs.forEach(input => {
 
@@ -76,35 +76,39 @@ var Site = {
 
                 // Check validity of every input
                 if (input.value == '' || input.validity.valueMissing == true) {
-                    state = 'invalid';
+                    inputState = 'invalid';
                     question.classList.add('is-invalid');
 
                 } else {
-                    state = 'valid';
+                    inputState = 'valid';
                     question.classList.remove('is-invalid');
                 }
             }
 
         });
 
-        return state;
+        return inputState;
 
-    },
+    };
 
-    form_validate_input: (form, event) => {
+    let form_reset_inputs = (form) => {
+        form.reset();
+        localStorage.setItem('currentQuestion', 0);
+    };
 
-        const Questions = Site.form_collect_questions(form);
+    let form_validate_input = (form, event) => {
 
-        // Actions
+        const Questions = form_collect_questions(form);
+
         Questions.forEach(function (question) {
-            Site.form_test_inputs(question, form);
+            form_test_inputs(question);
         });
 
-    },
+    }
 
-    form_handle_input: (form, event) => {
+    let form_handle_input = (form, event) => {
 
-        const Questions = Site.form_collect_questions(form);
+        const Questions = form_collect_questions(form);
         const totalAmountOfQuestions = Questions.length - 1;
 
         // Write currentQuestion
@@ -125,9 +129,9 @@ var Site = {
             } else {
                 // Executes when next question loads
                 set_active_class(currentQuestionStored);
-                Site.form_handle_key_press(currentQuestion, form);
+                form_handle_key_press(currentQuestion, form);
                 // Set focus
-                currentQuestion.querySelectorAll('input, textarea')[0].focus();
+                currentQuestion.querySelectorAll(FormElements)[0].focus();
             }
 
         } else {
@@ -162,7 +166,7 @@ var Site = {
 
                 if ((currentQuestion.dataset.type) == 'radio') {
 
-                    let radioInputs = Site.form_collect_inputs(currentQuestion);
+                    let radioInputs = form_collect_inputs(currentQuestion);
 
                     radioInputs.forEach(function (input) {
 
@@ -196,12 +200,12 @@ var Site = {
 
         function next_question() {
 
-            if (Site.form_test_inputs(currentQuestion) == 'valid') {
+            if (form_test_inputs(currentQuestion) == 'valid') {
 
                 if (currentQuestionValue < totalAmountOfQuestions) {
                     currentQuestion.classList.remove('is-active');
                     localStorage.setItem('currentQuestion', parseInt(currentQuestionValue) + 1);
-                    Site.form_handle_input(form);
+                    form_handle_input(form);
                 }
 
                 set_progress_meter(currentQuestionValue + 1);
@@ -219,7 +223,7 @@ var Site = {
             if (currentQuestionValue > 0) {
                 currentQuestion.classList.remove('is-active');
                 localStorage.setItem('currentQuestion', parseInt(currentQuestionValue) - 1);
-                Site.form_handle_input(form);
+                form_handle_input(form);
             }
 
         }
@@ -229,7 +233,7 @@ var Site = {
             event.preventDefault();
 
             if (currentQuestionValue == totalAmountOfQuestions) {
-                const Inputs = Site.form_collect_inputs(form);
+                const Inputs = form_collect_inputs(form);
                 const SubmitEls = document.querySelectorAll('.form__results span[data-question]');
 
                 form.style.display = "none";
@@ -237,7 +241,7 @@ var Site = {
                 // Append data-question spans with values
 
                 SubmitEls.forEach(el => {
-                    let questionValue = Site.form_get_value(form, el.dataset.question);
+                    let questionValue = form_get_value(form, el.dataset.question);
                     if (questionValue) {
                         el.innerHTML = questionValue;
                     }
@@ -278,11 +282,11 @@ var Site = {
 
         }
 
-    },
+    }
 
-    form_handle_key_press: (question, form) => {
+    let form_handle_key_press = (question, form, event) => {
 
-        const Inputs = Site.form_collect_inputs(question);
+        const Inputs = form_collect_inputs(question);
 
         function read_keys(event) {
 
@@ -299,13 +303,13 @@ var Site = {
                     // Handle inputs based on keys
 
                     if (inputKeys.includes('13')) {
-                        if (Site.form_handle_input(form, event) == true) {
+                        if (form_handle_input(form, event) == true) {
                             this.removeEventListener('keydown', read_keys);
                         }
                     }
 
                     if (inputKeys.includes(keyCode) && !inputKeys.includes('13')) {
-                        if (Site.form_handle_input(form, event) == true) {
+                        if (form_handle_input(form, event) == true) {
                             this.removeEventListener('keydown', read_keys);
                         }
                     }
@@ -320,11 +324,11 @@ var Site = {
 
         form.addEventListener('keydown', read_keys);
 
-    },
+    };
 
-    form_get_value: (form, question) => {
+    let form_get_value = (form, question, event) => {
 
-        const Inputs = Site.form_collect_inputs(form);
+        const Inputs = form_collect_inputs(form);
 
         if (question) {
 
@@ -340,8 +344,10 @@ var Site = {
 
         }
 
-    },
+    };
 
-}
+    return public;
+
+})();
 
 Site.init();
