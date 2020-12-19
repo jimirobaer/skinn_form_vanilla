@@ -104,8 +104,6 @@ var Site = {
 
     form_handle_input: (form, event) => {
 
-        console.log(event);
-
         const Questions = Site.form_collect_questions(form);
         const totalAmountOfQuestions = Questions.length - 1;
 
@@ -135,7 +133,7 @@ var Site = {
         } else {
 
             reset_buttons();
-            
+
             /* Form Controls based on Event Input
              */
             switch (event.target.dataset.action) {
@@ -146,7 +144,7 @@ var Site = {
                     prev_question(event);
                     break;
                 case 'submit':
-                    submit_form(event);
+                    submit_form(form, event);
                     break;
                 default:
                     break;
@@ -155,10 +153,32 @@ var Site = {
             /* Form Controls based on Keydown Event Input
              */
             if (event.keyCode) {
-                
+
                 if (event.keyCode == 13) {
-                    next_question();
-                    return true;
+                    if (next_question(event) == true) {
+                        return true;
+                    }
+                }
+
+                if ((currentQuestion.dataset.type) == 'radio') {
+
+                    let radioInputs = Site.form_collect_inputs(currentQuestion);
+
+                    radioInputs.forEach(function (input) {
+
+                        if (input.value == event.key) {
+                            input.checked = true;
+                        }
+
+                        // Short timeout after enter option (like Typeform)
+                        setTimeout(function () {
+                            if (next_question(event) == true) {
+                                return true;
+                            }
+                        }, 300);
+
+                    });
+
                 }
 
             }
@@ -167,6 +187,11 @@ var Site = {
 
         function set_active_class(index) {
             Questions[index].classList.add('is-active');
+        }
+
+        function set_progress_meter(value) {
+            let progressMeterEl = document.querySelector('.form__progress progress');
+            progressMeterEl.value = value;
         }
 
         function next_question() {
@@ -179,25 +204,53 @@ var Site = {
                     Site.form_handle_input(form);
                 }
 
+                set_progress_meter(currentQuestionValue + 1);
+
             } else {
                 alert('Invalid input, please check');
             }
 
+            return true;
+
         }
 
         function prev_question() {
+
             if (currentQuestionValue > 0) {
                 currentQuestion.classList.remove('is-active');
                 localStorage.setItem('currentQuestion', parseInt(currentQuestionValue) - 1);
                 Site.form_handle_input(form);
             }
+
         }
 
-        function submit_form(event) {
+        function submit_form(form, event) {
+
             event.preventDefault();
+
+            if (currentQuestionValue == totalAmountOfQuestions) {
+                const Inputs = Site.form_collect_inputs(form);
+                const SubmitEls = document.querySelectorAll('.form__results span[data-question]');
+
+                form.style.display = "none";
+
+                // Append data-question spans with values
+
+                SubmitEls.forEach(el => {
+                    let questionValue = Site.form_get_value(form, el.dataset.question);
+                    if (questionValue) {
+                        el.innerHTML = questionValue;
+                    }
+                });
+
+                set_progress_meter(totalAmountOfQuestions + 1);
+                reset_buttons(true);
+
+            }
+
         }
 
-        function reset_buttons() {
+        function reset_buttons(hide = false) {
 
             let btnNext = document.querySelector('[data-action=next]');
             let btnPrev = document.querySelector('[data-action=prev]');
@@ -217,6 +270,12 @@ var Site = {
                 btnNext.style.display = 'inline';
             }
 
+            if (hide == true) {
+                btnNext.style.display = 'none';
+                btnPrev.style.display = 'none';
+                btnSubmit.style.display = 'none';
+            }
+
         }
 
     },
@@ -224,7 +283,6 @@ var Site = {
     form_handle_key_press: (question, form) => {
 
         const Inputs = Site.form_collect_inputs(question);
-        form.addEventListener('keydown', read_keys);
 
         function read_keys(event) {
 
@@ -238,13 +296,19 @@ var Site = {
                     let inputKeys = input.dataset.key.split(',');
                     let keyCode = event.keyCode.toString();
 
-                    if (inputKeys.includes(keyCode)) {
+                    // Handle inputs based on keys
 
+                    if (inputKeys.includes('13')) {
                         if (Site.form_handle_input(form, event) == true) {
                             this.removeEventListener('keydown', read_keys);
                         }
+                    }
 
-                    };
+                    if (inputKeys.includes(keyCode) && !inputKeys.includes('13')) {
+                        if (Site.form_handle_input(form, event) == true) {
+                            this.removeEventListener('keydown', read_keys);
+                        }
+                    }
 
                 } else {
                     return false;
@@ -254,12 +318,27 @@ var Site = {
 
         }
 
-        // Get keys
-
+        form.addEventListener('keydown', read_keys);
 
     },
 
-    form_collect_results: (form) => {
+    form_get_value: (form, question) => {
+
+        const Inputs = Site.form_collect_inputs(form);
+
+        if (question) {
+
+            let inputValue = ''
+
+            Inputs.forEach(input => {
+                if (input.name == question) {
+                    inputValue = input.value;
+                }
+            });
+
+            return inputValue;
+
+        }
 
     },
 

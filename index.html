@@ -16,7 +16,7 @@
 
         <form class="form__wrapper" action="" id="form-1">
 
-            <div class="form__question" data-question="1" data-required="true">
+            <div class="form__question" data-question="1" data-required="true" data-type="text">
 
                 <div class="form__group">
                     <label for="question-1">What's your name?</label>
@@ -26,13 +26,13 @@
 
             </div>
 
-            <div class="form__question" data-question="2" data-required="true">
+            <div class="form__question" data-question="2" data-required="true" data-type="radio">
 
                 <div class="form__group">
                     <p>How are you liking this form so far?</p>
 
                     <div class="input__group">
-                        <input type="radio" id="1" name="form-1-question-2" data-question="2" value="1" data-key="49,97,13" required>
+                        <input type="radio" id="1" name="form-1-question-2" data-question="2" value="1" data-key="49,97" required>
                         <label for="1">It's okay <span>(1)</span></label>
                     </div>
 
@@ -57,7 +57,7 @@
 
             </div>
 
-            <div class="form__question" data-question="3" data-required="true">
+            <div class="form__question" data-question="3" data-required="true" data-type="textarea">
 
                 <div class="form__group">
                     <label for="question-3">Something to add?</label>
@@ -69,19 +69,23 @@
 
         </form>
 
+        <div class="form__results" data-form="form-1">
+            <p>Thanks for filling in the form, <span data-question="form-1-question-1"></span>.</p>
+        </div>
+
     </main>
 
     <div class="form__controls">
 
         <div class="form__progress">
-            <label for="form">Form progress</label>
-            <progress id="form" value="0" max="3"> 0 </progress>
+            <label for="form-1">Form progress</label>
+            <progress id="form-1" value="0" max="3"> 0 </progress>
         </div>
 
         <div class="form__buttons">
             <button data-form-button data-action="prev" data-form="form-1">Prev</button>
             <button data-form-button data-action="next" data-form="form-1">Next</button>
-            <button type="submit" data-form-button data-action="submit" form="form-1" data-form="form-1">Submit</button>
+            <button data-form-button data-action="submit" form="form-1" data-form="form-1">Submit</button>
         </div>
 
     </div>
